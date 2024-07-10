@@ -1,0 +1,91 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from Util import *
+from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
+from sklearn.linear_model import LinearRegression,Lasso
+from sklearn.preprocessing import PolynomialFeatures 
+import sweetviz as sv
+#import decision tree regressor
+from sklearn.model_selection import LeaveOneOut
+import json
+from scipy.optimize import minimize
+
+
+_, FG_desciprtors, T, SurfT, FG_labels,ids,Names,Tc,Tc_True = load_data("SurfTTrainingData_full.json")
+
+Temp=[]
+idx=[]
+
+
+X = np.array(FG_desciprtors)
+#interactions
+poly=PolynomialFeatures(1,include_bias = True)
+X=poly.fit_transform(X)
+X=np.hstack((np.log(X+1),np.ones((X.shape[0],1))))
+
+Tc_True=np.array(Tc_True)
+
+
+print(X.shape)
+print(Tc_True.shape)
+
+#LOOCV
+logo = LeaveOneOut()
+mape = []
+MAE_ls=[]
+MAPE_ls=[]
+LOO_Result = []
+Y_test_ls = []
+Y_pred_ls = []
+
+for train_inds, test_inds in logo.split(X,Tc_True):
+    X_train, X_test = X[train_inds], X[test_inds]
+    Y_train, Y_test = Tc_True[train_inds], Tc_True[test_inds]
+    model = LinearRegression()
+    model.fit(X_train, Y_train)
+    y_pred = model.predict(X_test)
+    mape=np.mean(np.abs((Y_test - y_pred) / Y_test)) * 100
+    MAE=np.mean(np.abs((Y_test - y_pred)))
+    LOO_Result.append([[Names[test_inds[0]]],MAE,mape])
+    MAE_ls.append(MAE)
+    MAPE_ls.append(mape)
+    Y_test_ls.append(Y_test)
+    Y_pred_ls.append(y_pred)
+
+#calculate the mean of MAE and MAPE
+MAPE_mean = np.mean(MAPE_ls)
+Max_MAPE = np.max(MAPE_ls)
+Min_MAPE = np.min(MAPE_ls)
+print(f'LOOCV Mean Absolute Percentage Error: {MAPE_mean:.2f}%')
+print(f'LOOCV Max Absolute Percentage Error: {Max_MAPE:.2f}%')
+print(f'LOOCV Min Absolute Percentage Error: {Min_MAPE:.2f}%')
+Tc_pred = np.concatenate(Y_pred_ls)
+print(Tc_pred.shape)
+
+#save the result
+with open('SurfTTrainingData_full.json', 'r') as infile:
+    HydrocarbonData = json.load(infile)
+
+for i in range(len(Tc_pred)):
+    HydrocarbonData[i]['Tc_Pred'] = Tc_pred[i]
+
+with open('SurfTTrainingData.json', 'w') as outfile:
+    json.dump(HydrocarbonData, outfile, indent=4)
+
+plt.figure(figsize=(6,5))
+for y_test,y_pred,Name in zip(Y_test_ls,Y_pred_ls,Names):
+    plt.scatter(y_test,y_pred,s=30,label=f"{Name}")
+plt.scatter([0],[0],label=f'Max MAPE {Max_MAPE:.2f}%',marker=None,visible=False,s=5)
+plt.scatter([0],[0],label=f'Min MAPE {Min_MAPE:.2f}%',marker=None,visible=False,s=5)
+plt.scatter([0],[0],label=f'Mean MAPE {MAPE_mean:.2f}%',marker=None,visible=False,s=5)
+plt.xlabel('True Tc')
+plt.ylabel('Predicted Tc')
+plt.xlim([400, 800])
+plt.ylim([400, 800])
+plt.plot([0, 800], [0, 800], ls='--', c='k')
+plt.legend(ncol=2,fontsize=5,loc='upper left')
+plt.title('True vs Predicted Tc LOOCV')
+plt.savefig('Figs\True_vs_Predicted_Tc_LOOCV_FG.png')
+plt.show() 
+
