@@ -19,12 +19,12 @@ t = db_1H[30]['t']
 y = db_1H[30]['y']
 #load the 1H spectra
 x = db_1H[30]['Frequency (ppm)']
-intes = db_1H[30]['Intensity']
+spectra_intensity = db_1H[30]['Intensity']
 
 #plot the 1H spectra
 plt.figure(figsize=(10,5))
 plt.subplot(1,2,1)
-plt.plot(x,intes)
+plt.plot(x,spectra_intensity)
 plt.xlabel('Frequency (ppm)')
 plt.ylabel('Intensity')
 plt.title('1H NMR Spectrum')
@@ -51,12 +51,12 @@ plt.show()
 #decimate the 1H spectra to 100 points
 for i in range(len(db_1H)):
     x = db_1H[i]['Frequency (ppm)']
-    intes = db_1H[i]['Intensity']
+    spectra_intensity = db_1H[i]['Intensity']
     x = signal.decimate(x,10)
-    intes = signal.decimate(intes,10)
+    spectra_intensity = signal.decimate(spectra_intensity,10)
     #intes = np.cumsum(intes)
     db_1H[i]['Frequency (ppm)'] = x
-    db_1H[i]['Intensity'] = intes
+    db_1H[i]['Intensity'] = spectra_intensity
     
 
 for i in range(len(db_1H)):
