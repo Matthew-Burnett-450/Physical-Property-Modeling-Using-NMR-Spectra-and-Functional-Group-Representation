@@ -21,13 +21,13 @@ class TargetConstructor():
         #if FileName not in Properties['property_names']:
         #    return [],[],False
         if FileName not in Properties['property_names']:
-            return [],[],True
+            return [],[],True,False
 
         idx = np.where(np.isin(Properties['equation_names'], list(self.StateEquations.keys())))[0]
         EqName = [Properties['equation_names'][i] for i in idx]
         idx=int(idx[-1])
         #print(EqName)
-        #idx=Properties['equation_names'].index(EqName[0])
+        #dx=Properties['equation_names'].index(EqName[0])
 
         Params=Properties['equation_parameters'][idx]
         VarRange=Properties['variable_ranges'][idx]
@@ -45,6 +45,7 @@ class TargetConstructor():
         self.x=T.flatten().tolist()
         self.Y=Y.flatten().tolist()
         
-        return self.x,self.Y,Tc
+        print(len(self.x),len(self.Y))  
+        return self.x,self.Y,Tc,EqName[-1] #return the temperature, surface tension, and critical temperature
 
 

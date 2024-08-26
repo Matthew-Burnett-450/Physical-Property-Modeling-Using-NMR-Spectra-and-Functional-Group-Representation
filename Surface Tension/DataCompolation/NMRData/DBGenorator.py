@@ -22,7 +22,10 @@ def generate_spectra(smiles):
     return y_1H,y_13C
 
 # Load the data
-Names, Smiles = np.loadtxt('NMRData\molecules.csv', delimiter='\t', unpack=True, dtype=str, skiprows=1)
+data = np.loadtxt(r'InitFuelList\NameCanadites.txt', dtype=str, delimiter='\t', skiprows=1)
+CAS = data[:, 0]
+Smiles = data[:, 1]
+Names = data[:, 2]
 
 # Load the database once before processing
 db_1H = NMR1H.load_db('SpectraDB.json')

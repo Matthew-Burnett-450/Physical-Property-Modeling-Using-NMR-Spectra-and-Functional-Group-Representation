@@ -4,16 +4,10 @@ import time
 import json
 
 #load NMRData\molecules.csv 
-"""# Name	Structure
-Hexane	CCCCCC
-Heptane	CCCCCCC
-Octane	CCCCCCCC
-Nonane	CCCCCCCCC
-Decane	CCCCCCCCCC"""
-HydrocarbonData = np.loadtxt('NMRData\molecules.csv',delimiter='\t',dtype='str',skiprows=1)
-Names = HydrocarbonData[:,0]
-Smiles = HydrocarbonData[:,1]
-
+data = np.loadtxt('InitFuelList\CAS_Smiles.txt', dtype=str, delimiter='\t', skiprows=1)
+CAS = data[:, 0]
+Smiles = data[:, 1]
+Names = data[:, 2]
 pg.sleep(3)
 
 for i,name in enumerate(Names):
@@ -22,7 +16,7 @@ for i,name in enumerate(Names):
 
     print(name)
 
-    print(len(HydrocarbonData)- i)
+    print(len(CAS)- i)
     #press control n
     pg.hotkey('ctrl','n')
     pg.sleep(0.1)
@@ -47,12 +41,12 @@ for i,name in enumerate(Names):
     except:
         pass
     try:
-        if pg.locateOnScreen('ThermoData\Scraper\ErrorBox.png',confidence=0.8)!=None:
+        if pg.locateOnScreen('ThermoData\Scraper\ErrorBox.png',confidence=0.5)!=None:
             #press escape
             pg.press('esc')
             pg.sleep(0.1)
             pg.press('esc')
-
+            print('Error')
             continue
     except:
         pass
@@ -61,8 +55,10 @@ for i,name in enumerate(Names):
     pg.sleep(0.1)
 
     Eval=False
+    count = 0
     while Eval==False:
         print('waiting')
+
         try:
             try:
                 if pg.locateOnScreen('ThermoData\Scraper\EvaluatedData.png',confidence=0.5)!=None:
@@ -77,7 +73,10 @@ for i,name in enumerate(Names):
             pg.sleep(0.1)
         except:
             pass
-
+        count+=1
+        if count>20:
+            continue
+    count = 0
     pg.sleep(1)
 
     Eval=False

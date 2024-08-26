@@ -55,7 +55,7 @@ class Watson(EqWrapper):
 
         # Ensuring T does not reach or exceed Tc
         Tc = Params[-1]
-        T = T[T < Tc]
+        #T = T[T < Tc]
 
         a1 = Params[0]
         ai_coeffs = Params[1:-1]  # Exclude Tc
