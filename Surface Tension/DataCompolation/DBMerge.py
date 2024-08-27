@@ -36,33 +36,72 @@ for entry in db_13C:
             entry['Tc'] = entry2['Tc']
             break
     combined_db['13C'].append(entry)
+# If there are entries without TDE data, remove them. 
+# Check for empty t, y, and Tc. If there is a KeyError, remove the entry.
 
-#if there are entries without TDE data, remove them check for empty t and y and tc if there is a key error remove the entry
-for spectra in combined_db['1H']:
+for spectra in combined_db['1H'][:]:
     try:
-        if len(spectra['t']) == 0 or len(spectra['y']) == 0 or spectra['Tc'] == 0:
+        if spectra.get('t') == [] or spectra.get('y') == [] or spectra.get('Tc') == []:
             combined_db['1H'].remove(spectra)
     except KeyError:
         combined_db['1H'].remove(spectra)
 
 print('1H Finished')
 
-for spectra in combined_db['13C']:
+for spectra in combined_db['13C'][:]:
     try:
-        if len(spectra['t']) == 0 or len(spectra['y']) == 0 or spectra['Tc'] == 0:
+        if spectra.get('t') == [] or spectra.get('y') == [] or spectra.get('Tc') == []:
             combined_db['13C'].remove(spectra)
     except KeyError:
         combined_db['13C'].remove(spectra)
 
-#if intensity or frequency is None
-for spectra in combined_db['1H']:
-    if None in spectra['y']:
+# If intensity or frequency is None, or if there is a KeyError, remove the entry
+
+for spectra in combined_db['1H'][:]:
+    try:
+        if None in spectra.get('t', []) or None in spectra.get('y', []):
+            combined_db['1H'].remove(spectra)
+    except KeyError:
         combined_db['1H'].remove(spectra)
 
-for spectra in combined_db['13C']:
-    if None in spectra['y']:
+for spectra in combined_db['13C'][:]:
+    try:
+        if None in spectra.get('t', []) or None in spectra.get('y', []):
+            combined_db['13C'].remove(spectra)
+    except KeyError:
         combined_db['13C'].remove(spectra)
 
+
+#check if Intensity or Frequency is None
+for spectra in combined_db['1H'][:]:
+    try:
+        if spectra.get('Intensity') == None or spectra.get('Frequency (ppm)') == None:
+            combined_db['1H'].remove(spectra)
+    except KeyError:
+        combined_db['1H'].remove(spectra)
+    
+for spectra in combined_db['13C'][:]:
+    try:
+        if spectra.get('Intensity') == None or spectra.get('Frequency (ppm)') == None:
+            combined_db['13C'].remove(spectra)
+    except KeyError:
+        combined_db['13C'].remove(spectra)
+
+#if y or t keys dont exist remove the entry
+for spectra in combined_db['1H'][:]:
+    try:
+        if spectra.keys() != {'Smiles', 'Frequency (ppm)', 'Intensity', 't', 'y', 'Tc'}:
+            combined_db['1H'].remove(spectra)
+    except KeyError:
+        combined_db['1H'].remove(spectra)
+
+for spectra in combined_db['13C'][:]:
+    try:
+        if spectra.keys() != {'Smiles', 'Frequency (ppm)', 'Intensity', 't', 'y', 'Tc'}:
+            combined_db['13C'].remove(spectra)
+    except KeyError:
+        combined_db['13C'].remove(spectra)
+        
 
 #save the combined db dont update the file clear and write
 with open('TrainingDB.json', 'w') as f:
