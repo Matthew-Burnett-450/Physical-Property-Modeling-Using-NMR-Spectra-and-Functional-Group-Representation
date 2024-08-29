@@ -1,5 +1,5 @@
 import numpy as np
-from DataCompolation.FeatureGenerator import get_data_test
+from DataCompolation.NMRFeatureGenerator import get_data
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from Model import NMR1DCNN
+from NMRModel import NMR1DCNN
 from scipy import signal
 
 # Load the model
@@ -16,7 +16,7 @@ model.load_state_dict(torch.load('Model.pth'))
 model.eval()
 
 # Load the data from get_data_test
-x, Y, T, Names, features2 = get_data_test()
+x, Y, T, Names, features2 = get_data()
 
 A = np.ones((len(Y), 1))
 B = np.ones((len(Y), 1))

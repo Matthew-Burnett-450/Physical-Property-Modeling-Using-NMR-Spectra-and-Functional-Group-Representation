@@ -1,5 +1,5 @@
 import numpy as np
-from DataCompolation.NMRFeatureGenerator import get_data
+from DataCompolation.FGFeatureGenerator import get_data
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
@@ -7,67 +7,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from NMRModel import NMR1DCNN
+from FGModel import FGNN
 
 # Load the data
-x, Y, T, Names, features = get_data()
+FG, Target,T,Visc,Names = get_data()
 
-# Remove duplicates from Y, T, Names, and features based on Names
-Y = np.array(Y)
-T = np.array(T)
-Names = np.array(Names)
-features = np.array(features)
-idx = np.unique(Names, return_index=True)[1]
-Y = Y[idx]
-T = T[idx]
-Names = Names[idx]
-features = features[idx]
+features = FG
 
-# Remove names list
-List = ['2-Methylcyclohexanol']
-idx = np.where(Names == List[0])
-Y = np.delete(Y, idx[0], axis=0)
-T = np.delete(T, idx[0], axis=0)
-Names = np.delete(Names, idx[0], axis=0)
-features = np.delete(features, idx[0], axis=0)
-
-print(x.shape)
-
-A = np.ones((len(Y), 1))
-B = np.ones((len(Y), 1))
-for i in range(len(Y)):
-    y = Y[i]
-    y = np.array(y)
-    y = np.log(y)
-    t = T[i]
-    t = np.array(t)
-
-    y = y[t > 250]
-    t = t[t > 250]
-    y = y[t < 600]
-    t = t[t < 600]
-    name = Names[i]
-    
-    # Fit A + B*t
-    a = np.ones((len(t), 1))
-    b = t.reshape(-1, 1)
-    X = np.concatenate((a, 1 / b), axis=1)
-    linear = np.linalg.lstsq(X, y, rcond=None)
-    y_hat = X.dot(linear[0])
-    r2 = r2_score(y, y_hat)
-    print(f'{name} R2: {r2}')
-    A[i] = linear[0][0]
-    B[i] = linear[0][1]
-
-Y = np.hstack((A, B))
-print(Y.shape)
 
 # Standardize the data
 scaler = StandardScaler()
-Y = scaler.fit_transform(Y)
+Y = scaler.fit_transform(Target)
 
 # Define the network
-model = NMR1DCNN(input_length=6554)
+model = FGNN(input_length=len(features[0]))
 
 # Define the optimizer
 optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01)
@@ -76,16 +29,16 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01)
 criterion = nn.MSELoss()
 
 # Define the number of epochs
-num_epochs = 500
+num_epochs = 1500
 
 # Convert the data to PyTorch tensors
-x_tensor = torch.tensor(features, dtype=torch.float32).unsqueeze(1)  # Add a channel dimension
+x_tensor = torch.tensor(features, dtype=torch.float32)
 y_tensor = torch.tensor(Y, dtype=torch.float32)
 
 # Train-test split
 idx = np.arange(x_tensor.shape[0])
 np.random.shuffle(idx)
-idx_train, idx_val = idx[:int(0.99*len(idx))], idx[int(0.99*len(idx)):]
+idx_train, idx_val = idx[:int(0.99*len(idx))], idx[int(.99*len(idx)):]
 x_tensor_train, x_tensor_val = x_tensor[idx_train], x_tensor[idx_val]
 y_tensor_train, y_tensor_val = y_tensor[idx_train], y_tensor[idx_val]
 names_train, names_val = np.array(Names)[idx_train], np.array(Names)[idx_val]
@@ -168,5 +121,5 @@ plt.title('True vs. Predicted')
 plt.show()
 
 # Save the model
-torch.save(model.state_dict(), 'model.pth')
+torch.save(model.state_dict(), 'FGmodel.pth')
 

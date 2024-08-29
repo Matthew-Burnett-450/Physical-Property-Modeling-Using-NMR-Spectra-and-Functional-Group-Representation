@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 def get_data():
 
     # Load the data
-    with open('DataCompolation\TrainingDB.json', 'r') as f:
+    with open(r'DataCompolation\NMRTrainingDB.json', 'r') as f:
         data = json.load(f)
         db_1H = data['1H']
 
@@ -84,10 +84,10 @@ def get_data():
 
 
 
-def get_data_test():
+def get_data():
 
     # Load the data
-    with open('DataCompolation\TrainingDB.json', 'r') as f:
+    with open(r'DataCompolation\NMRTrainingDB.json', 'r') as f:
         data = json.load(f)
         db_1H = data['1H']
 

@@ -2,12 +2,12 @@ import numpy as np
 import json
 
 #load both json files
-with open(r'NMRData/SpectraDB.json', 'r') as f:
+with open(r'DataCompolation/NMRData/SpectraDB.json', 'r') as f:
     data = json.load(f)
     db_1H = data['1H']
     db_13C = data['13C']
 
-with open(r'ThermoData/NISTData.json', 'r') as f:
+with open(r'DataCompolation/ThermoData/NISTData.json', 'r') as f:
     data = json.load(f)
     db_TDE = data
 
