@@ -51,6 +51,20 @@ class NMR1HSpectraGenerator:
         for shift, intensity in zip(shifts, intensities):
             y += intensity * lorenzian(x, shift, lw)
 
+        #plot chemical shifts and full curve
+        plt.plot(shifts, intensities, 'bo',label='Chemical Shifts')
+        plt.plot(x, y, 'k-', label='Predicted Curve')
+        #plot idividual lorentzians
+        for shift, intensity in zip(shifts, intensities):
+            plt.plot(x, intensity * lorenzian(x, shift, lw), 'r--', alpha=0.5)
+        
+        plt.gca().invert_xaxis()
+        plt.xlabel('Frequency (ppm)')
+        plt.ylabel('Intensity')
+        plt.title('Simulated NMR Spectrum')
+        plt.legend()
+        plt.show()
+
         #y = y / np.max(y)
 
         return y

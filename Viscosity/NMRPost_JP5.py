@@ -65,7 +65,7 @@ features = signal.decimate(features, 10)
 features = features.reshape(1, 6554)
 
 #plot features and x_jet features2[0]
-plt.plot(x_jet, features[0], label='JP5')
+plt.plot(x_jet, features[0], label='JP5',color='k',linewidth=3)
 plt.xlabel('Frequency (ppm)')
 plt.ylabel('Intensity')
 plt.legend()

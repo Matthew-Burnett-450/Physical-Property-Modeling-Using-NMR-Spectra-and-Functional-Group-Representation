@@ -23,6 +23,8 @@ T = T[idx]
 Names = Names[idx]
 features = features[idx]
 
+
+
 # Remove names list
 List = ['2-Methylcyclohexanol']
 idx = np.where(Names == List[0])
@@ -30,6 +32,9 @@ Y = np.delete(Y, idx[0], axis=0)
 T = np.delete(T, idx[0], axis=0)
 Names = np.delete(Names, idx[0], axis=0)
 features = np.delete(features, idx[0], axis=0)
+
+#save names 
+np.savetxt('NamesNMR.csv',Names,delimiter=',',fmt='%s')
 
 print(x.shape)
 

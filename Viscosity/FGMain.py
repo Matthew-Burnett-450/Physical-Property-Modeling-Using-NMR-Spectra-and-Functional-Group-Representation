@@ -14,6 +14,8 @@ FG, Target,T,Visc,Names = get_data()
 
 features = FG
 
+#save names 
+np.savetxt('NamesFG.csv',Names,delimiter=',',fmt='%s')
 
 # Standardize the data
 scaler = StandardScaler()

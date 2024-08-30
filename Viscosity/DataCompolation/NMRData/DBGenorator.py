@@ -6,7 +6,7 @@ import concurrent.futures
 import json
 
 #load SpectrumData.json to get lw and dl for 13C and 1H
-with open('NMRData\RealFuelData\SpectrumData.json', 'r') as f:
+with open(r'DataCompolation\NMRData\RealFuelData\SpectrumData.json', 'r') as f:
     data = json.load(f)
 H_lw = data['1H']['PeakWidth']
 H_dl = data['1H']['DataLength']
@@ -22,7 +22,7 @@ def generate_spectra(smiles):
     return y_1H,y_13C
 
 # Load the data
-data = np.loadtxt(r'InitFuelList\NameCanadites.txt', dtype=str, delimiter='\t', skiprows=1)
+data = np.loadtxt(r'DataCompolation\InitFuelList\NameCanadites.txt', dtype=str, delimiter='\t', skiprows=1)
 CAS = data[:, 0]
 Smiles = data[:, 1]
 Names = data[:, 2]
@@ -32,6 +32,12 @@ db_1H = NMR1H.load_db('SpectraDB.json')
 db_13C = NMR13C.load_db('SpectraDB.json')
 
 results = []
+
+#predict random sameple
+smiles = 'CCCCCC'
+y_1H,y_13C = generate_spectra(smiles)
+
+
 
 # Use ThreadPoolExecutor to parallelize the task
 with concurrent.futures.ThreadPoolExecutor() as executor:
